@@ -265,20 +265,52 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/larksuite/base-sdk-go/v3"
 	"github.com/larksuite/base-sdk-go/v3/core"
 	"github.com/larksuite/base-sdk-go/v3/service/drive/v1"
 )
 
+// 如果附件开启高级权限，需要配置Extra字段。
+// Attachments格式：第一个key为字段id，第二个key为记录id，value为文件token数组。详见：
+// https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/drive-v1/media/introduction
+type Extra struct {
+	BitablePerm struct {
+		TableId     string                         `json:"tableId"`
+		Attachments map[string]map[string][]string `json:"attachments"`
+	} `json:"bitablePerm"`
+}
+
 func main() {
 	// 创建 Client
 	// 全局baseAppToken,如果builder中有也设置了全局appToken，以build中为准
 	client := lark.NewClient("personalBaseToken", "appToken")
+
+	// 如果开启高级权限，设置extra
+	extra := &Extra{
+		BitablePerm: struct {
+			TableId     string                         `json:"tableId"`
+			Attachments map[string]map[string][]string `json:"attachments"`
+		}(struct {
+			TableId     string
+			Attachments map[string]map[string][]string
+		}{TableId: "table_id", Attachments: map[string]map[string][]string{
+			"field_id": {
+				"record_id": {"file_token"},
+			},
+		}}),
+	}
+	bs, err := json.Marshal(extra)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	// 创建请求对象
 	req := larkdrive.NewDownloadMediaReqBuilder().
-		FileToken("boxcnrHpsg1QDqXAAAyachabcef").
-		Extra("[请参考-上传点类型及对应Extra说明](https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/drive-v1/media/introduction)").
+		FileToken("appToken").
+		Extra(string(bs)).
 		Build()
 	// 发起请求
 	resp, err := client.Drive.Media.Download(context.Background(), req)
