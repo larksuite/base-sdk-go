@@ -3,7 +3,7 @@
 
 ## 安装
 ```go
-go get -u github.com/larksuite/base-sdk-go
+go get -u github.com/larksuite/base-sdk-go/v3
 ```
 
 ## Base Client
@@ -159,39 +159,49 @@ SDK 提供了语义化的调用方式，只需要提供相关参数创建 client
 package main
 
 import (
-    "context"
-    "fmt"
-    "github.com/larksuite/base-sdk-go/v3"
-    "github.com/larksuite/base-sdk-go/v3/core"
-    "github.com/larksuite/base-sdk-go/v3/service/bitable/v1"
+	"context"
+	"fmt"
+	"github.com/larksuite/base-sdk-go/v3"
+	"github.com/larksuite/base-sdk-go/v3/core"
+	"github.com/larksuite/base-sdk-go/v3/service/base/v1"
 )
 
 func main() {
-    // 创建 Client
-    // 全局baseAppToken,如果builder中有也设置了全局appToken，以build中为准
-    client := lark.NewClient("personalBaseToken", "appToken")
-    // 创建请求对象
-    req := larkbitable.NewListAppTableRecordReqBuilder().
-       TableId("tblAUv48hgESYQMz").
-       PageSize(20).
-       Build()
-    // 发起请求
-    resp, err := client.Base.AppTableRecord.List(context.Background(), req)
+	// 创建 Client
+	// 全局baseAppToken,如果builder中有也设置了全局appToken，以build中为准
+	client := lark.NewClient("personalBaseToken", "appToken")
+	// 创建请求对象
+	req := larkbase.NewListAppTableRecordReqBuilder().
+		AppToken("bascnCMII2ORej2RItqpZZUNMIe").
+		TableId("tblxI2tWaxP5dG7p").
+		ViewId("vewqhz51lk").
+		Filter("AND(CurrentValue.[身高]>180, CurrentValue.[体重]>150)").
+		Sort("").
+		FieldNames("").
+		TextFieldAsArray(true).
+		UserIdType("user_id").
+		DisplayFormulaRef(true).
+		AutomaticFields(true).
+		PageToken("recn0hoyXL").
+		PageSize(20).
+		Build()
+	// 发起请求
+	resp, err := client.Base.AppTableRecord.List(context.Background(), req)
 
-    // 处理错误
-    if err != nil {
-       fmt.Println(err)
-       return
-    }
+	// 处理错误
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-    // 服务端错误处理
-    if !resp.Success() {
-       fmt.Println(resp.Code, resp.Msg, resp.RequestId())
-       return
-    }
+	// 服务端错误处理
+	if !resp.Success() {
+		fmt.Println(resp.Code, resp.Msg, resp.RequestId())
+		return
+	}
 
-    // 业务处理
-    fmt.Println(larkcore.Prettify(resp))
+	// 业务处理
+	fmt.Println(larkcore.Prettify(resp))
 }
 ```
 
