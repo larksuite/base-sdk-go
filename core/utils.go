@@ -146,7 +146,7 @@ func isEmptyVal(v reflect.Value) bool {
 }
 
 func userAgent() string {
-	return fmt.Sprintf("base-sdk-go/%s", version)
+	return fmt.Sprintf("base-open-sdk-go/%s", version)
 }
 
 func readResponse(resp *http.Response) ([]byte, error) {
